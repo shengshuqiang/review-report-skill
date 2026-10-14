@@ -10,7 +10,7 @@ npx skills add shengshuqiang/review-report-skill --skill '*' --global --agent co
 
 摘自 2026-10-08 自动化加载验收报告：iPhone 16e 模拟器 / iOS 26.2。仅展示当时画面，不代表当前状态或下方 Bridge 改动的验收结果。
 
-![模拟器截图局部与红圈说明：①准备页未进入游戏；②分享回退页404](docs/images/simulator-red-circles.png)
+![模拟器截图局部与红圈说明：①准备页未进入游戏；②分享回退页404](docs/images/simulator-red-circles.jpg)
 
 - **① 停在准备页：** 原报告记录观察 30 秒后，仍显示“PREPARING THE PITCH”。
 - **② 分享页 404：** 回退入口出现错误页，不能据此判定原游戏加载成功。
