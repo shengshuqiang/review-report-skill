@@ -1,0 +1,148 @@
+/* 配色、单列 panel、实际/预期与证据标签基于 plain-language/assets/h5-report-template.html；增加逐文件 diff 与折叠筛选。 */
+:root{color-scheme:light;--ink:#172033;--muted:#667085;--line:#d8dee9;--paper:#fff;--bg:#f4f6fa;--accent:#2457d6;--red:#b42318;--green:#087443;--danger-soft:#fff0ed;--ok-soft:#eaf8f0;--warn:#8a4b08;--warn-soft:#fff6dc}
+.actual,.expected{padding:10px 12px;border-radius:10px;white-space:pre-wrap;overflow-wrap:anywhere}
+.actual{color:var(--red);background:var(--danger-soft)}
+.expected{color:var(--green);background:var(--ok-soft)}
+.evidence-refs{color:var(--accent);background:#eaf0ff;padding:8px 12px;border-radius:8px}
+.evidence-label{display:inline-block;background:var(--warn-soft);color:var(--warn);padding:3px 10px;border-radius:99px;font-size:13px;font-weight:650}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:1.2rem}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+main{max-width:1440px;margin:0 auto;padding:32px 28px 72px}
+h1,h2,h3{line-height:1.35;overflow-wrap:anywhere}
+h1{font-size:30px;margin:.3rem 0 1rem}
+h2{font-size:23px;margin:0 0 20px}
+h3{font-size:20px}
+p{margin:.7rem 0}
+a{color:#165897;text-underline-offset:3px}
+a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #368be7;outline-offset:3px}
+button,input,select{font:inherit}
+button{cursor:pointer;border:1px solid #afc4db;background:#fff;border-radius:6px;color:var(--ink);padding:5px 11px}
+button:hover{background:#eaf2fa}
+input[type=search],select{border:1px solid #afc4db;border-radius:5px;padding:5px 7px;max-width:100%}
+code{font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace}
+section,.report-header{margin:0 0 24px;padding:24px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.eyebrow{color:var(--muted);font-size:13px;margin:0}
+.report-summary{white-space:pre-wrap}
+.summary-stats{display:flex;flex-wrap:wrap;gap:12px 20px;margin-top:20px;font-size:15px}
+.addition{color:var(--green);font-weight:650}
+.deletion{color:var(--red);font-weight:650}
+.draft-banner{position:sticky;top:0;z-index:10;border:2px solid #b0781c;background:#fff0cf;padding:12px 18px;border-radius:9px;margin-bottom:22px;font-weight:700}
+.field-grid{display:grid;grid-template-columns:150px minmax(0,1fr);gap:9px 16px;margin:18px 0}
+.field-grid dt{font-weight:650}
+.field-grid dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.boundary-note{border-left:4px solid #8ea9c8;padding:10px 15px;background:#f0f5fc;color:#344e6c}
+.issue-index{padding-left:1.3rem;margin:0}
+.issue-index li{padding:8px 0}
+.issue-index li>span{display:block;font-size:13px;color:var(--muted)}
+.priority{display:inline-block;background:#fff0e8;color:#8a4020;padding:1px 7px;border:1px solid #e0af91;border-radius:4px;font-size:13px;font-weight:700}
+.review-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:11px 15px;padding:15px;background:#edf3fa;border-radius:9px}
+.review-toolbar label{display:flex;align-items:center;gap:5px;font-size:14px}
+.review-toolbar input[type=search]{width:230px}
+#filter-result{color:var(--muted);font-size:13px}
+.interaction-status:empty{display:none}
+.interaction-status{font-size:13px;color:var(--muted)}
+.file-list{padding-left:30px;margin:20px 0}
+.file-item{padding-left:5px;margin:0 0 18px}
+.file-review{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+summary{cursor:pointer}
+summary::marker{color:var(--accent)}
+.file-summary{padding:16px 18px;list-style-position:inside}
+.file-summary:hover,.hunk-review>summary:hover{background:#f3f7fc}
+.file-primary{display:inline-flex;align-items:baseline;gap:10px;max-width:100%;vertical-align:top}
+.file-path{font-weight:650;overflow-wrap:anywhere;min-width:0}
+.bucket{flex:none;border:1px solid #92b8dd;color:#144d86;background:#e9f3ff;font-size:12px;border-radius:5px;padding:1px 7px;white-space:nowrap}
+.bucket-1{background:#eaf8ef;color:#24603a;border-color:#99caaa}
+.bucket-2{background:#fff3df;color:#815813;border-color:#d8bc80}
+.bucket-3{background:#f2ecff;color:#63428d;border-color:#bca9da}
+.bucket-4,.bucket-5{background:#f0f2f5;color:#54616d;border-color:#b9c2ca}
+.file-metrics{display:flex;flex-wrap:wrap;gap:7px 15px;padding-left:19px;margin-top:9px;color:var(--muted);font-size:13px}
+.status{border:1px solid #d2dce7;border-radius:4px;padding:0 5px}
+.problem-count{color:#9b3328;font-weight:650}
+.file-content{padding:0 22px 22px;border-top:1px solid #e8edf5}
+.review-fields{padding-left:24px;margin:18px 0}
+.review-fields li{padding:5px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.review-fields li>span{white-space:pre-wrap}
+.file-issues,.hunk-issues{padding:8px 0}
+.issue-ref{display:inline-block;border:1px solid #dbada8;background:#fff2f0;padding:0 6px;border-radius:4px;margin:0 4px 0 0}
+.patch-actions{display:flex;gap:10px;flex-wrap:wrap;padding-top:18px;border-top:1px solid var(--line)}
+.diff-legend{font-size:13px;color:var(--muted)}
+.diff-meta{padding:14px;background:#edf2f8;border:1px solid #d8e2ee;border-radius:7px;overflow:auto;white-space:pre;margin:16px 0}
+.hunk-review{margin:18px 0;border:1px solid #c9d8e9;border-radius:8px;overflow:hidden}
+.hunk-review>summary{padding:12px 14px;background:#edf4fc;font-weight:650}
+.anchor-label{font-size:12px;color:var(--muted);margin-left:12px;font-weight:400}
+.hunk-review .field-grid{padding:0 16px}
+.hunk-review .hunk-issues{padding:0 16px 10px}
+.diff-code{background:#0f1c2c;color:#e1ebf7;overflow:auto;margin:0;padding:10px 0;font:13px/1.7 ui-monospace,SFMono-Regular,Consolas,"Liberation Mono",monospace;tab-size:4}
+.diff-code code{font:inherit;white-space:normal;display:block;width:max-content;min-width:100%}
+.diff-row{display:grid;grid-template-columns:55px 55px minmax(0,1fr);min-width:100%;white-space:pre}
+.diff-row .old-line,.diff-row .new-line{color:#a5b9d1;text-align:right;padding:0 9px;user-select:none;background:#ffffff03}
+.code-text{display:block;white-space:pre;padding:0 12px}
+.diff-row.added{background:#143f32;color:#def7e8}
+.diff-row.removed{background:#51232d;color:#ffe1e5}
+.diff-row.hunk-header{background:#21344f;color:#9ed3ff}
+.diff-row.metadata{color:#bcc8d7}
+.wrap-code .diff-code code{width:100%}
+.wrap-code .code-text{white-space:pre-wrap;overflow-wrap:anywhere}
+.wrap-code .diff-meta{white-space:pre-wrap;overflow-wrap:anywhere}
+.issue-card{border:1px solid #d7b7ae;border-left:5px solid #ba6950;padding:18px 20px;border-radius:9px;margin:20px 0;background:#fffdfb}
+.issue-card.priority-P0,.issue-card.priority-P1{border-left-color:#bd4135}
+.issue-card h3{margin-top:0}
+.evidence-label{color:#6a503f;font-size:14px}
+.location-links{overflow-wrap:anywhere}
+.repro{border-top:1px solid #dfd4cf;margin-top:20px;padding-top:14px}
+.repro>summary{font-weight:650}
+.repro-type{font-size:12px;padding:2px 7px;margin-left:9px;border-radius:4px}
+.repro-type.candidate{color:#805b18;background:#fff0cd}
+.repro-type.executed{color:#21603c;background:#e3f6e9}
+.repro-steps{padding-left:26px}
+.repro-steps li{padding:5px 0;white-space:pre-wrap}
+.table-scroll{overflow:auto}
+table{border-collapse:collapse;min-width:700px;width:100%;font-size:15px}
+th,td{border:1px solid #d8e1eb;padding:10px 12px;text-align:left;vertical-align:top;white-space:pre-wrap;overflow-wrap:anywhere}
+th{background:#edf3fa;font-weight:650}
+tbody tr:nth-child(even){background:#f8fafc}
+.matrix-section{padding:22px}
+footer{font-size:12px;color:var(--muted);padding:6px 4px;overflow-wrap:anywhere}
+.skip-link{position:absolute;top:-70px;left:20px;padding:10px;background:#fff;z-index:30}
+.skip-link:focus{top:10px}
+[hidden]{display:none!important}
+.baseline{margin:0 0 24px;padding:24px;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+.baseline-title{font-size:18px}
+.overall-item{margin-top:22px;padding:18px 20px;border-top:2px solid var(--line);background:#f7faff}
+.code-cell{display:flex;align-items:flex-start;min-width:0}
+.code-cell .code-text{flex:1;min-width:0}
+.diff-row.is-focus{box-shadow:inset 4px 0 0 #e11d48;background-image:linear-gradient(#e11d481a,#e11d481a)}
+.focus-markers{display:inline-flex;gap:3px;flex:none;padding-left:7px}
+.evidence-marker{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;margin-top:0;color:#fff;background:#e11d48;border:1px solid #ffd7e2;border-radius:50%;font:700 12px/1 sans-serif;user-select:none}
+.focus-explanations{padding:0 18px 0 40px;white-space:pre-wrap;overflow-wrap:anywhere}
+.focus-explanations li{padding:5px 0}
+@media(max-width:720px){main{padding:18px 10px 42px}
+section,.report-header{padding:18px 14px}
+h1{font-size:25px}
+h2{font-size:21px}
+.field-grid{grid-template-columns:1fr;gap:3px}
+.field-grid dd{margin-bottom:10px}
+.file-list{padding-left:23px}
+.file-summary{padding:13px 10px}
+.file-primary{display:inline;word-break:break-word}
+.bucket{margin-right:6px}
+.file-content{padding:0 12px 16px}
+.review-toolbar{padding:12px}
+.review-toolbar input[type=search]{width:180px}
+.diff-row{grid-template-columns:40px 40px minmax(0,1fr)}
+.diff-row .old-line,.diff-row .new-line{padding:0 5px}
+.code-text{padding:0 7px}
+.issue-card{padding:16px 12px}
+}
+@media print{body{background:#fff}
+main{padding:0;max-width:none}
+button,.review-toolbar,.patch-actions,.skip-link{display:none!important}
+section,.report-header,.file-review,.issue-card{break-inside:avoid;border-radius:0}
+.diff-code{font-size:10px}
+.table-scroll{overflow:visible}
+table{min-width:0;font-size:15px}
+th,td{padding:5px}
+a{color:inherit}
+.draft-banner{position:static}
+}

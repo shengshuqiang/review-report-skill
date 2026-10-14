@@ -1,0 +1,6 @@
+interface:
+  display_name: "审查报告"
+  short_description: "生成逐文件H5审查报告，展示完整diff、必要性、问题与复现路径"
+  default_prompt: "使用 $review-report 生成当前改动的审查报告，逐文件展示完整 diff 与分段解释。"
+policy:
+  allow_implicit_invocation: true

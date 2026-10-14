@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{REPORT_TITLE}}</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #667085;
+      --line: #d8dee9;
+      --panel: #ffffff;
+      --canvas: #f4f6fa;
+      --primary: #2457d6;
+      --primary-soft: #eaf0ff;
+      --danger: #b42318;
+      --danger-soft: #fff0ed;
+      --warn: #8a4b08;
+      --warn-soft: #fff6dc;
+      --ok: #087443;
+      --ok-soft: #eaf8f0;
+      --annotation: #e11d48;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--canvas);
+      font: 15px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 32px));
+      margin: 32px auto 64px;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+    figure { margin: 0; }
+    h1 { margin-bottom: 10px; font-size: clamp(28px, 4vw, 42px); line-height: 1.2; }
+    h2 { margin-bottom: 16px; font-size: 22px; }
+    h3 { margin-bottom: 10px; font-size: 18px; }
+
+    .eyebrow, .meta, .supporting { color: var(--muted); }
+    .eyebrow { margin-bottom: 8px; font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-bottom: 24px; }
+
+    .panel {
+      margin-top: 18px;
+      padding: 24px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(23, 32, 51, .06);
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 20px;
+      align-items: start;
+      border-left: 5px solid var(--primary);
+    }
+
+    .badge, .evidence-link {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .badge.is-confirmed { color: var(--ok); background: var(--ok-soft); }
+    .badge.is-pending { color: var(--warn); background: var(--warn-soft); }
+    .evidence-link { color: var(--primary); background: var(--primary-soft); text-decoration: none; }
+
+    .issue-grid, .evidence-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .issue, .evidence-card {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+    }
+
+    .field { margin-top: 14px; }
+    .field-label { display: block; margin-bottom: 4px; color: var(--muted); font-size: 13px; font-weight: 700; }
+    .repro { margin: 8px 0 0; padding-left: 22px; }
+    .actual { color: var(--danger); background: var(--danger-soft); }
+    .expected { color: var(--ok); background: var(--ok-soft); }
+    .actual, .expected { padding: 10px 12px; border-radius: 10px; }
+
+    .code-frame {
+      overflow: hidden;
+      margin-top: 14px;
+      border: 1px solid #28354f;
+      border-radius: 12px;
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    .code-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 14px;
+      color: #cbd5e1;
+      background: #1e293b;
+      font-size: 12px;
+    }
+
+    pre { margin: 0; padding: 12px 0; overflow-x: auto; }
+    pre code { display: block; min-width: max-content; font: 13px/1.7 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    .code-line { position: relative; display: grid; grid-template-columns: 48px minmax(0, 1fr); padding: 0 16px 0 8px; }
+    .line-no { color: #64748b; text-align: right; padding-right: 14px; user-select: none; }
+    .line-code { white-space: pre; }
+    .code-line.is-focus { background: rgba(225, 29, 72, .18); box-shadow: inset 4px 0 0 var(--annotation); }
+    .marker {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      width: 20px;
+      height: 20px;
+      color: #fff;
+      background: var(--annotation);
+      border-radius: 50%;
+      text-align: center;
+      line-height: 20px;
+      font: 700 12px/20px sans-serif;
+      transform: translate(-50%, -50%);
+    }
+
+    .image-stage {
+      position: relative;
+      width: 100%;
+      margin-top: 14px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #0f172a;
+    }
+
+    .image-stage img { display: block; width: 100%; height: auto; }
+    .annotation-layer { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    .annotation-shape { fill: rgba(225, 29, 72, .08); stroke: var(--annotation); stroke-width: 8; }
+    .annotation-arrow { fill: none; stroke: var(--annotation); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+    .annotation-pin circle { fill: var(--annotation); stroke: #fff; stroke-width: 5; }
+    .annotation-pin text { fill: #fff; font: 700 30px sans-serif; }
+
+    .callouts { margin: 14px 0 0; padding: 0; list-style: none; }
+    .callouts li { display: grid; grid-template-columns: 26px 1fr; gap: 8px; margin-top: 8px; }
+    .callout-no { width: 24px; height: 24px; color: #fff; background: var(--annotation); border-radius: 50%; text-align: center; font-weight: 700; line-height: 24px; }
+
+    @media (max-width: 760px) {
+      main { width: min(100% - 20px, 680px); margin-top: 18px; }
+      .panel { padding: 18px; }
+      .summary, .issue-grid, .evidence-grid { grid-template-columns: 1fr; }
+      .code-head { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <p class="eyebrow">{{REPORT_SCOPE}}</p>
+      <h1>{{REPORT_TITLE}}</h1>
+      <div class="meta">
+        <span>更新时间：{{UPDATED_AT}}</span>
+        <span>基线：{{BASELINE}}</span>
+      </div>
+    </header>
+
+    <section class="panel summary" aria-labelledby="summary-title">
+      <div>
+        <p class="eyebrow">结论</p>
+        <h2 id="summary-title">{{ONE_SENTENCE_CONCLUSION}}</h2>
+        <p>{{SUMMARY_DETAIL}}</p>
+        <a class="evidence-link" href="#evidence-e1">查看证据 E1</a>
+      </div>
+      <span class="badge is-pending">{{OVERALL_STATUS}}</span>
+    </section>
+
+    <section class="panel" aria-labelledby="issues-title">
+      <h2 id="issues-title">用户会遇到什么</h2>
+      <div class="issue-grid">
+        <article class="issue">
+          <h3>{{ISSUE_1_TITLE}}</h3>
+          <div class="field"><span class="field-label">影响</span>{{ISSUE_1_IMPACT}}</div>
+          <div class="field">
+            <span class="field-label">复现路径</span>
+            <ol class="repro">
+              <li>{{ISSUE_1_STEP_1}}</li>
+              <li>{{ISSUE_1_STEP_2}}</li>
+              <li>{{ISSUE_1_STEP_3}}</li>
+            </ol>
+          </div>
+          <div class="field actual"><strong>实际：</strong>{{ISSUE_1_ACTUAL}}</div>
+          <div class="field expected"><strong>预期：</strong>{{ISSUE_1_EXPECTED}}</div>
+          <div class="field"><span class="field-label">原因与状态</span>{{ISSUE_1_REASON_AND_STATUS}}</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="evidence-title">
+      <h2 id="evidence-title">证据</h2>
+      <div class="evidence-grid">
+        <article class="evidence-card" id="evidence-e1">
+          <span class="badge is-confirmed">E1 · {{EVIDENCE_1_LEVEL}}</span>
+          <h3>{{EVIDENCE_1_TITLE}}</h3>
+          <p>{{EVIDENCE_1_PROVES}}</p>
+
+          <div class="code-frame" aria-label="代码证据 E1">
+            <div class="code-head"><code>{{CODE_PATH_AND_LINES}}</code><span>E1</span></div>
+            <pre><code><span class="code-line"><span class="line-no">{{LINE_BEFORE_NO}}</span><span class="line-code">{{ESCAPED_LINE_BEFORE}}</span></span>
+<span class="code-line is-focus"><span class="marker">1</span><span class="line-no">{{FOCUS_LINE_NO}}</span><span class="line-code">{{ESCAPED_FOCUS_LINE}}</span></span>
+<span class="code-line"><span class="line-no">{{LINE_AFTER_NO}}</span><span class="line-code">{{ESCAPED_LINE_AFTER}}</span></span></code></pre>
+          </div>
+          <ol class="callouts">
+            <li><span class="callout-no">1</span><span>{{CODE_CALLOUT_1}}</span></li>
+          </ol>
+        </article>
+
+        <article class="evidence-card" id="evidence-e2">
+          <span class="badge is-confirmed">E2 · {{EVIDENCE_2_LEVEL}}</span>
+          <h3>{{EVIDENCE_2_TITLE}}</h3>
+          <p>{{EVIDENCE_2_PROVES}}</p>
+
+          <figure>
+            <div class="image-stage">
+              <img src="{{IMAGE_DATA_URL}}" alt="{{IMAGE_ALT}}">
+              <svg class="annotation-layer" viewBox="0 0 {{IMAGE_WIDTH}} {{IMAGE_HEIGHT}}" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+                <ellipse class="annotation-shape" cx="{{MARK_CX}}" cy="{{MARK_CY}}" rx="{{MARK_RX}}" ry="{{MARK_RY}}" />
+                <g class="annotation-pin" transform="translate({{PIN_X}} {{PIN_Y}})">
+                  <circle r="28" />
+                  <text text-anchor="middle" dy="0.35em">1</text>
+                </g>
+              </svg>
+            </div>
+            <figcaption class="supporting">{{IMAGE_SOURCE_AND_TIME}}</figcaption>
+          </figure>
+          <ol class="callouts">
+            <li><span class="callout-no">1</span><span>{{IMAGE_CALLOUT_1}}</span></li>
+          </ol>
+        </article>
+      </div>
+    </section>
+
+    <section class="panel" aria-labelledby="actions-title">
+      <h2 id="actions-title">下一步</h2>
+      <ol class="repro">
+        <li>{{ACTION_1}}</li>
+        <li>{{ACTION_2}}</li>
+      </ol>
+    </section>
+  </main>
+</body>
+</html>

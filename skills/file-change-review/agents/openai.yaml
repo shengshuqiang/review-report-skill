@@ -1,0 +1,4 @@
+interface:
+  display_name: "最小必要文件改动审查"
+  short_description: "审查最小必要改动，并从用户视角说明影响范围与潜在隐患"
+  default_prompt: "Use $file-change-review 审查当前 diff 的最小必要性；逐文件给出必要性、影响和隐患，每个独立问题单独列出；触达 Android 或 iOS 实现代码时，结论还要说明另一端业务逻辑是否一致。"

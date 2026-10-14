@@ -1,0 +1,4 @@
+interface:
+  display_name: "说清楚"
+  short_description: "用证据充分、关键点可视标注的 H5 页面说清技术问题"
+  default_prompt: "Use $plain-language to 生成一份可转发的 H5 说明页，从用户视角逐项说明问题和复现路径，并高亮代码或圈选图片中的关键证据。"
